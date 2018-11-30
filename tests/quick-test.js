@@ -134,4 +134,4 @@ sagaTask
     }
   });
 
-sagaTask.dispatch('WILDCARD_PROMISE_EXAMPLE', 1);
+sagaTask.cancel('some reason');

@@ -1,7 +1,7 @@
 {
   "name": "sagaz",
   "version": "0.0.3",
-  "description": "Handle Javascript Timers in a manageable way",
+  "description": "Concurrency made simple.",
   "main": "dist/index.js",
   "author": "Braden R. Napier",
   "license": "MIT",
