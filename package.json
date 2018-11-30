@@ -1,0 +1,99 @@
+{
+  "name": "sagaz",
+  "version": "0.0.1",
+  "description": "Handle Javascript Timers in a manageable way",
+  "main": "dist/index.js",
+  "author": "Braden R. Napier",
+  "license": "MIT",
+  "reveal": true,
+  "files": [
+    "lib"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/odo-network/sagaz/"
+  },
+  "keywords": [
+    "saga",
+    "redux-saga",
+    "concurrency",
+    "task",
+    "fork",
+    "cps",
+    "threads",
+    "worker"
+  ],
+  "scripts": {
+    "build": "cross-env NODE_ENV=production rimraf dist && npm-run-all -p build:**",
+    "build:pubchan:babel": "cross-env NODE_ENV=production babel src --out-dir dist",
+    "build:pubchan:flow": "flow-copy-source src dist",
+    "coverage": "npm-run-all coverage:*",
+    "coverage:tests": "cross-env NODE_ENV=test nyc yarn test && nyc report --reporter=html --reporter=text-lcov | coveralls",
+    "coverage:flow": "flow-coverage-report",
+    "flow": "flow",
+    "prepublishOnly": "npm-run-all build",
+    "test": "cross-env NODE_ENV=test nyc mocha --require @babel/register --recursive ./tests/tests/*.js",
+    "try": "babel-node ./tests/quick-test",
+    "try-redux": "babel-node ./redux-saga/index"
+  },
+  "nyc": {
+    "reporter": [
+      "html",
+      "lcov",
+      "text"
+    ],
+    "require": [
+      "@babel/register"
+    ],
+    "exclude": [
+      "tests/",
+      "**/node_modules/**"
+    ],
+    "sourceMap": false,
+    "instrument": false,
+    "report-dir": "dev/coverage/tests"
+  },
+  "flow-coverage-report": {
+    "globIncludePatterns": [
+      "src/**/*.js",
+      "src/**/*.jsx"
+    ],
+    "reportTypes": [
+      "text",
+      "html"
+    ],
+    "outputDir": "dev/coverage/flow",
+    "flowCommandPath": "node_modules/.bin/flow"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.1.6",
+    "@babel/node": "^7.0.0",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-proposal-do-expressions": "^7.0.0",
+    "@babel/preset-env": "^7.1.6",
+    "@babel/preset-flow": "^7.0.0",
+    "@babel/register": "^7.0.0",
+    "babel-eslint": "^10.0.1",
+    "babel-plugin-istanbul": "^5.1.0",
+    "babel-preset-minify": "^0.5.0",
+    "chai": "^4.2.0",
+    "coveralls": "^3.0.2",
+    "cross-env": "^5.2.0",
+    "eslint": "^5.9.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-flowtype": "^3.2.0",
+    "eslint-plugin-import": "^2.14.0",
+    "flow-bin": "^0.86.0",
+    "flow-copy-source": "^2.0.2",
+    "flow-coverage-report": "^0.6.0",
+    "mocha": "^5.2.0",
+    "npm-run-all": "^4.1.5",
+    "nyc": "^13.1.0",
+    "projectz": "^1.5.3",
+    "pubchan": "^1.11.0",
+    "pubsub-js": "^1.7.0",
+    "rimraf": "^2.6.2"
+  }
+}
