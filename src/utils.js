@@ -14,7 +14,7 @@ import {
   KILL_LOOP, END, CANCEL, EMPTY_ARRAY,
 } from './constants';
 
-import { SagaCancellationError } from './errors';
+import { SagaCancellation } from './errors';
 
 import buildProcess from './proc';
 
@@ -109,7 +109,7 @@ export function cancelSaga(job: Saga$Job, args?: Array<any> = EMPTY_ARRAY) {
   if (job.status.complete && job.children.size === 0) return;
 
   job.status.cancelled = true;
-  job.status.error = new SagaCancellationError(job, args[0]);
+  job.status.error = new SagaCancellation(job, args[0]);
 
   if (job.children.size) {
     [...job.children].reverse().forEach(child => cancelSaga(child, args));

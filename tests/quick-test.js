@@ -110,31 +110,28 @@
 // }, 10000);
 
 import {
-  runSaga, Saga, take, fork,
+  runSaga, Saga, take, SagaCancellation,
 } from '../src';
 
-function* forkedSaga(...args): Generator<any, any, any> {
-  while (true) {
-    const [, args2] = yield take('SECOND_TYPE');
-    console.log('SECOND_TYPE RECEIVED ', args, args2);
-  }
-}
-
 function* rootSaga(): Generator<any, any, any> {
-  while (true) {
-    const [, args] = yield take('MY_TYPE');
-    console.log('MY_TYPE RECEIVED ', args);
-    yield fork(forkedSaga, ...args);
-  }
+  const [type, args] = yield take('*');
+  console.log('TYPE RECEIVED: ', type, args);
+  return [type, args];
 }
 
-Saga(rootSaga);
-Saga(forkedSaga);
+const sagaTask = runSaga(Saga(rootSaga));
 
-const sagaTask = runSaga(rootSaga);
+sagaTask
+  .promise()
+  .then(result => {
+    console.log('Root Saga Result: ', result);
+  })
+  .catch(err => {
+    if (err instanceof SagaCancellation) {
+      console.log('Saga Was Cancelled!');
+    } else {
+      console.log('Saga Error: ', err);
+    }
+  });
 
-sagaTask.dispatch('MY_TYPE', 1);
-sagaTask.dispatch('MY_TYPE', 2);
-
-sagaTask.dispatch('SECOND_TYPE', 5);
-sagaTask.dispatch('SECOND_TYPE', 6);
+sagaTask.dispatch('WILDCARD_PROMISE_EXAMPLE', 1);

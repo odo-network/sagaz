@@ -87,3 +87,39 @@ SECOND_TYPE RECEIVED  [ 2 ] [ 5 ]
 SECOND_TYPE RECEIVED  [ 1 ] [ 6 ]
 SECOND_TYPE RECEIVED  [ 2 ] [ 6 ]
 ```
+
+### Promised Result
+
+It is also possible to get a promise that resolves to the result of any saga. Since cancellation isn't a native part of `Promise` we throw a custom error in its place that you can check against within a catch clause.
+
+```js
+import { runSaga, Saga, take, SagaCancellation } from "sagaz";
+
+function* rootSaga(): Generator<any, any, any> {
+  const [type, args] = yield take("*");
+  console.log("TYPE RECEIVED: ", type, args);
+  return [type, args];
+}
+
+const sagaTask = runSaga(Saga(rootSaga));
+
+sagaTask
+  .promise()
+  .then(result => {
+    console.log("Root Saga Result: ", result);
+  })
+  .catch(err => {
+    if (err instanceof SagaCancellation) {
+      console.log("Saga Was Cancelled!");
+    } else {
+      console.log("Saga Error: ", err);
+    }
+  });
+
+sagaTask.dispatch("WILDCARD_PROMISE_EXAMPLE", 1);
+```
+
+```
+TYPE RECEIVED:  WILDCARD_PROMISE_EXAMPLE [ 1 ]
+Root Saga Result:  [ 'WILDCARD_PROMISE_EXAMPLE', [ 1 ] ]
+```
