@@ -166,7 +166,7 @@ export function getTotalSize(job: Saga$Job) {
 }
 
 export function getAndValidateTask(
-  startTask: Saga$Factory,
+  startTask: Saga$Factory | Saga$Runner,
   withArgs: Array<any>,
   job: $Shape<Saga$Job>,
 ): Saga$Saga {
@@ -188,6 +188,8 @@ export function getAndValidateTask(
     if (taskValidated && typeof _task === 'function') {
       task = Saga({ run: _task });
     } else if (typeof _task === 'object' && typeof _task.run === 'function') {
+      // Flow Fails Here
+      // $FlowIgnore
       task = _task;
     }
   }

@@ -1,6 +1,6 @@
 /* @flow */
 
-import type { Saga$Factory, Saga$Job } from './types';
+import type { Saga$Factory, Saga$Job, Saga$Runner } from './types';
 
 import { ROOT_SAGAS } from './context';
 import { KILL_LOOP, EMPTY_OBJECT, EMPTY_ARRAY } from './constants';
@@ -73,7 +73,7 @@ async function loopJob(job: Saga$Job, _response) {
 
 function createJob(
   id: Array<number>,
-  startTask: Saga$Factory,
+  startTask: Saga$Factory | Saga$Runner,
   rootJob: void | Saga$Job,
   withContext: Object,
   withArgs: Array<any>,
@@ -140,18 +140,22 @@ function createJob(
         return promise;
       },
       dispatch(type, ...args) {
-        console.log('[DISPATCH]: ', type);
+        if (
+          !job.root.context.takes.has('*')
+          && !job.root.context.takes.has(type)
+        ) {
+          return;
+        }
         const wildcardSet = job.root.context.takes.get('*');
+        const set = new Set(job.root.context.takes.get(type));
         if (wildcardSet) {
-          wildcardSet.forEach(descriptor => {
+          Array.from(wildcardSet).forEach(descriptor => {
             if (descriptor.finally) {
               descriptor.finally(descriptor);
             }
             loopJob(descriptor.job, [type, args]);
           });
         }
-        const set = job.root.context.takes.get(type);
-        if (!set) return;
         set.forEach(descriptor => {
           if (wildcardSet && wildcardSet.has(descriptor)) return;
           if (descriptor.finally) {
@@ -184,7 +188,7 @@ function createJob(
 
 export default function buildProcess(
   id: Array<number>,
-  startTask: Saga$Factory,
+  startTask: Saga$Factory | Saga$Runner,
   rootJob?: void | Saga$Job,
   withContext?: Object = EMPTY_OBJECT,
   withArgs?: Array<any> = EMPTY_ARRAY,

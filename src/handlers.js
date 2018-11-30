@@ -68,7 +68,7 @@ const handle = {
   },
   // $FlowIgnore
   [ERROR]([_err]: [Saga$Error], job: Saga$Job) {
-    console.log('Handle Error! ', _err);
+    // console.log('Handle Error! ', _err);
     // $FlowIgnore
     const err: Saga$Error = typeof _err === 'symbol' ? new Error(String(_err)) : _err;
     if (typeof err === 'object' && !err.saga) {

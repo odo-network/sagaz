@@ -109,18 +109,32 @@
 //   sagaTask.cancel('fail');
 // }, 10000);
 
-import { runSaga, Saga, take } from '../src';
+import {
+  runSaga, Saga, take, fork,
+} from '../src';
 
-const sagaTask = runSaga(
-  Saga(function* rootSaga(): Generator<any, any, any> {
-    while (true) {
-      const [, args] = yield take('MY_TYPE');
-      console.log('Receive MY_TYPE: ', args);
-    }
-  }),
-);
+function* forkedSaga(...args): Generator<any, any, any> {
+  while (true) {
+    const [, args2] = yield take('SECOND_TYPE');
+    console.log('SECOND_TYPE RECEIVED ', args, args2);
+  }
+}
+
+function* rootSaga(): Generator<any, any, any> {
+  while (true) {
+    const [, args] = yield take('MY_TYPE');
+    console.log('MY_TYPE RECEIVED ', args);
+    yield fork(forkedSaga, ...args);
+  }
+}
+
+Saga(rootSaga);
+Saga(forkedSaga);
+
+const sagaTask = runSaga(rootSaga);
 
 sagaTask.dispatch('MY_TYPE', 1);
 sagaTask.dispatch('MY_TYPE', 2);
-sagaTask.dispatch('MY_TYPE', 3);
-sagaTask.dispatch('MY_TYPE', 4);
+
+sagaTask.dispatch('SECOND_TYPE', 5);
+sagaTask.dispatch('SECOND_TYPE', 6);
