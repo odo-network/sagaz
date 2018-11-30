@@ -140,24 +140,15 @@ function createJob(
         return promise;
       },
       dispatch(type, ...args) {
-        if (
-          !job.root.context.takes.has('*')
-          && !job.root.context.takes.has(type)
-        ) {
-          return;
-        }
-        const wildcardSet = job.root.context.takes.get('*');
-        const set = new Set(job.root.context.takes.get(type));
-        if (wildcardSet) {
-          Array.from(wildcardSet).forEach(descriptor => {
-            if (descriptor.finally) {
-              descriptor.finally(descriptor);
-            }
-            loopJob(descriptor.job, [type, args]);
-          });
-        }
-        set.forEach(descriptor => {
-          if (wildcardSet && wildcardSet.has(descriptor)) return;
+        const hasWildcard = job.root.context.takes.has('*');
+        const hasType = job.root.context.takes.has(type);
+
+        if (!hasWildcard && !hasType) return;
+
+        new Set([
+          ...(hasWildcard ? job.root.context.takes.get('*') : EMPTY_ARRAY),
+          ...(hasType ? job.root.context.takes.get(type) : EMPTY_ARRAY),
+        ]).forEach(descriptor => {
           if (descriptor.finally) {
             descriptor.finally(descriptor);
           }
