@@ -50,7 +50,7 @@ Receive MY_TYPE:  [ 4 ]
 ### Simple Take & Fork
 
 ```js
-import { runSaga, Saga, take, fork } from "../src";
+import { runSaga, Saga, take, fork } from "sagaz";
 
 function* forkedSaga(...args): Generator<any, any, any> {
   while (true) {
